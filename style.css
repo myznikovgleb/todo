@@ -1,0 +1,158 @@
+* {
+    margin: 0;
+    padding: 0;
+
+    font-family: "Poppins", sans-serif;
+}
+
+body {
+    min-height: 100vh;
+
+    background-image: linear-gradient(120deg, #ffbbbb, #bbbbff);
+    color: #ffffff;
+}
+
+header {
+    min-height: 30vh;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    font-size: 2em;
+}
+
+form {
+    min-height: 20vh;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.todo-input-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.todo-input {
+    padding: 1vh;
+    border: none;
+    min-width: 55vw;
+
+    font-size: 2.0em;
+
+    background-color: #ffffff;
+}
+
+.todo-input:focus {
+    outline: none;
+}
+
+.todo-add-button {
+    border: none;
+    padding: 1vh 2.5vh;
+
+    font-size: 2.0em;
+
+    background-color: #ffffff;
+    color: #bbbbff;
+
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.todo-add-button:hover {
+    background-color: #bbbbff;
+    color: #ffffff;
+}
+
+.todo-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.todo-list {
+    min-width: 70vw;
+    list-style: none;
+}
+
+.todo-wrap {
+    margin: 1vh;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    font-size: 1.5em;
+
+    background-color: #ffffff;
+    color: #000000;
+
+    transition: all 0.3s;
+}
+
+.todo-item {
+    flex-grow: 1;
+    padding: 0vh 1vh;
+}
+
+.todo-complete-button {
+    border: none;
+    padding: 0vh 2vh;
+
+    font-size: 1.5em;
+
+    background-color: #bbbbff;
+    color: #ffffff;
+
+    cursor: pointer;
+}
+
+.todo-remove-button {
+    border: none;
+    padding: 0vh 2vh;
+
+    font-size: 1.5em;
+
+    background-color: #ffbbbb;
+    color: #ffffff;
+
+    cursor: pointer;
+}
+
+.completed {
+    opacity: 0.25;
+}
+
+.removed {
+    transform: translateY(100px);
+    opacity: 0;
+}
+
+.material-icons {
+    pointer-events: none;
+}
+
+.todo-select-wrapper {
+    margin: 1vh;
+    padding: 1vh;
+    position: relative;
+    overflow: hidden;
+}
+
+.todo-select {
+    width: 25vw;
+    padding: 2.45vh;
+
+    font-size: 1.5em;
+
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    outline: none;
+    border: none;
+    cursor: pointer;
+}

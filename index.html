@@ -1,0 +1,40 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <link rel="stylesheet" type="text/css" href="./style.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        
+        <title>Todo</title>
+    </head>
+
+    <body>
+        <header>
+            <h1>Todo</h1>
+        </header>
+
+        <form>
+            <div class="todo-input-wrapper">
+                <input class="todo-input"></input>
+                <button class="todo-add-button"><span class="material-icons">add</span></button>
+            </div>
+            <div class="todo-select-wrapper">
+                <select name="todo-select" class="todo-select">
+                    <option value="all">All</option>
+                    <option value="completed">Done</option>
+                    <option value="uncompleted">Undone</option>
+                </select>
+            </div>
+        </form>
+
+        <div class="todo-container">
+            <ul class="todo-list">
+            </ul>
+        </div>
+
+        <script src="./app.js"> </script>
+    </body>
+</html>
