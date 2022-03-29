@@ -22,6 +22,7 @@ function addTodo(event) {
     let todoItem;
     let todoCompleteButton;
     let todoRemoveButton;
+    let todo;
 
     // prevent default submitting
     event.preventDefault();
@@ -34,6 +35,10 @@ function addTodo(event) {
     todoItem = document.createElement('li');
     todoItem.classList.add('todo-item');
     todoItem.innerText = todoInput.value;
+    todo = {
+        content: todoItem.innerText,
+        status: '',
+    };
 
     // make todo complete button
     todoCompleteButton = document.createElement('button');
@@ -54,7 +59,7 @@ function addTodo(event) {
     todoList.appendChild(todoWrap);
 
     // save session storage todo
-    saveTodo(todoItem.innerText);
+    saveTodo(todo);
 
     // release todo input
     todoInput.value = '';
@@ -72,13 +77,15 @@ function handleTodo(event) {
         todoWrap = event.target.parentElement;
         todoWrap.classList.toggle('completed');
 
+        // update session storage todos
+        updateTodos(todoWrap, 'completed');
+
         return;
     }
 
     // handle todo remove button
     else if (event.target.classList[0] === 'todo-remove-button') {
         let todoWrap;
-        let todoItemTexts;
 
         // mark removed todo wrap
         todoWrap = event.target.parentElement;
@@ -89,17 +96,8 @@ function handleTodo(event) {
             todoWrap.remove();
         });
 
-        // get session storage todos
-        if (sessionStorage.getItem('todoItemTexts') === null) {
-            todoItemTexts = [];
-        }
-        else {
-            todoItemTexts = JSON.parse(sessionStorage.getItem('todoItemTexts'));
-        }
-
-        // remove session storage todo
-        todoItemTexts.splice(todoItemTexts.indexOf(todoWrap.children[0].innerText), 1);
-        sessionStorage.setItem('todoItemTexts', JSON.stringify(todoItemTexts));
+        // update session storage todos
+        updateTodos(todoWrap, 'removed');
 
         return;
     }
@@ -137,36 +135,36 @@ function filterTodos(event) {
 }
 
 // save session storage todo
-function saveTodo(todoItemText) {
-    let todoItemTexts;
+function saveTodo(todo) {
+    let todos;
     
     // get session storage todos
-    if (sessionStorage.getItem('todoItemTexts') === null) {
-        todoItemTexts = [];
+    if (sessionStorage.getItem('todos') === null) {
+        todos = [];
     }
     else {
-        todoItemTexts = JSON.parse(sessionStorage.getItem('todoItemTexts'));
+        todos = JSON.parse(sessionStorage.getItem('todos'));
     }
     
-    // save session storage todo
-    todoItemTexts.push(todoItemText);
-    sessionStorage.setItem('todoItemTexts', JSON.stringify(todoItemTexts));
+    // save session storage todos
+    todos.push(todo);
+    sessionStorage.setItem('todos', JSON.stringify(todos));
 }
 
 // get session storage todos
 function getTodos() {
-    let todoItemTexts;
+    let todos;
 
     // get session storage todos 
-    if (sessionStorage.getItem('todoItemTexts') === null) {
-        todoItemTexts = [];
+    if (sessionStorage.getItem('todos') === null) {
+        todos = [];
     }
     else {
-        todoItemTexts = JSON.parse(sessionStorage.getItem('todoItemTexts'));
+        todos = JSON.parse(sessionStorage.getItem('todos'));
     }
 
-    // get session storage todo
-    todoItemTexts.forEach(function(todoItemText) {
+    // get session storage todos
+    todos.forEach(function(todo) {
         let todoWrap;
         let todoItem;
         let todoCompleteButton;
@@ -175,11 +173,13 @@ function getTodos() {
         // make todo wrap
         todoWrap = document.createElement('div');
         todoWrap.classList.add('todo-wrap');
+        if (todo.status == 'completed') 
+            todoWrap.classList.toggle('completed');
 
         // make todo item
         todoItem = document.createElement('li');
         todoItem.classList.add('todo-item');
-        todoItem.innerText = todoItemText;
+        todoItem.innerText = todo.content;
 
         // make todo complete button
         todoCompleteButton = document.createElement('button');
@@ -199,4 +199,30 @@ function getTodos() {
         // add todo wrap to todo list
         todoList.appendChild(todoWrap);
     });
+}
+
+// update session storage todos
+function updateTodos(todoWrap, todoStatus) {
+    let todos;
+    
+    // get session storage todos
+    if (sessionStorage.getItem('todos') === null) {
+        todos = [];
+    }
+    else {
+        todos = JSON.parse(sessionStorage.getItem('todos'));
+    }
+    
+    // update session storage todos
+    for (let i = 1; i < todoList.childNodes.length; i++) {
+        if (todoList.childNodes[i] === todoWrap) {
+            if (todoStatus == 'completed') {
+                todos[i-1].status = todoStatus;
+            }
+            else {
+                todos.splice(i-1, 1);
+            }
+        }
+    }
+    sessionStorage.setItem('todos', JSON.stringify(todos));
 }
