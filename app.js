@@ -217,7 +217,7 @@ function updateTodos(todoWrap, todoStatus) {
     for (let i = 1; i < todoList.childNodes.length; i++) {
         if (todoList.childNodes[i] === todoWrap) {
             if (todoStatus == 'completed') {
-                todos[i-1].status = todoStatus;
+                todos[i-1].status == '' ? todos[i-1].status = todoStatus : todos[i-1].status = '';
             }
             else {
                 todos.splice(i-1, 1);
