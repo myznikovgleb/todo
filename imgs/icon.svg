@@ -3,9 +3,6 @@
     xmlns="http://www.w3.org/2000/svg"> 
 
     <circle cx="16.0" cy="16.0" r="16.0" fill="#bbbbbb"/>
-    <circle cx="16.0" cy="16.0" r="12.0" fill="#ffffff"/>
-
-    <line x1="16.0" x2="16.0" y1="16.0" y2=" 0.0" stroke="#ffffff" stroke-width="8.0"/>  
-    <line x1="16.0" x2="27.4" y1="16.0" y2="27.4" stroke="#ffffff" stroke-width="8.0"/>
+    <circle cx="16.0" cy="16.0" r="12.0" fill="#ffffff" fill-opacity="0.5"/>
 
 </svg>
