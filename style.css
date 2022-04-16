@@ -1,16 +1,6 @@
 * {
     margin:  0;
     padding: 0;
-    
-    --brdr-color: #bdbdbd;
-    --tex1-color: #000000;
-    --tex2-color: #ffffff;
-    --bac1-color: #ffffff;
-    --bac2-color: #f6f6f6;
-    --acp1-color: #22a44a;
-    --acp2-color: #119339;
-    --rjc1-color: #cc2525;
-    --rjc2-color: #bb1414;
 
     font-family: "Montserrat", sans-serif;
 
@@ -25,6 +15,39 @@
     font-size: 1.5em;
 }
 
+::placeholder {
+    color:   var(--tex3-color);
+    opacity: 1;
+}
+
+/* theme style */
+
+.light {
+    --back-color: #ffffff;
+    --brdr-color: #bdbdbd;
+    --tex1-color: #000000;
+    --tex2-color: #ffffff;
+    --tex3-color: #bdbdbd;
+    --acp1-color: #22a44a;
+    --acp2-color: #119339;
+    --rjc1-color: #cc2525;
+    --rjc2-color: #bb1414;
+}
+
+.dark {
+    --back-color: #25252f;
+    --brdr-color: #bdbdbd;
+    --tex1-color: #ffffff;
+    --tex2-color: #ffffff;
+    --tex3-color: #e1e1e1;
+    --acp1-color: #22a44a;
+    --acp2-color: #119339;
+    --rjc1-color: #cc2525;
+    --rjc2-color: #bb1414;    
+}
+
+/* body style */
+
 body {
     min-height: 100vh;
 
@@ -33,9 +56,11 @@ body {
     align-items:     center;
     flex-direction:  column;
 
-    background-color: var(--bac1-color);
+    background-color: var(--back-color);
     color:            var(--tex1-color);
 }
+
+/* header style */
 
 header {
     min-height: 20vh;
@@ -69,6 +94,9 @@ header {
 
     border: var(--brdr-color) 1px solid;
     border-radius: 5px;
+
+    background-color: var(--back-color);
+    color:            var(--tex1-color);
 
     font-size: 1.5em;
 }
