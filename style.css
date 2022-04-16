@@ -9,10 +9,7 @@
 
 .material-icons {
     pointer-events: none;
-}
-
-.material-icons.md-20 {
-    font-size: 1.5em;
+    font-size: 2.5em;
 }
 
 ::placeholder {
@@ -23,7 +20,7 @@
 /* theme style */
 
 .light {
-    --back-color: #ffffff;
+    --back-color: #f7f7f7;
     --brdr-color: #bdbdbd;
     --tex1-color: #000000;
     --tex2-color: #ffffff;
@@ -60,10 +57,61 @@ body {
     color:            var(--tex1-color);
 }
 
+/* env style */
+
+.todo-env-wrap {
+    min-height: 10vh;
+
+    padding-right: 10vw;
+    padding-top:   2.5vh;
+
+    display:         flex;
+    margin-left:     auto;
+}
+
+.todo-env-cb {
+    display: none;
+}
+
+.todo-env-label {
+    width:  5.0em;
+    height: 2.5em;
+
+	display:         flex;
+	justify-content: space-evenly;
+	align-items:     center;
+
+	position: relative;
+
+    border-radius: 1.25em;
+    border: var(--brdr-color) 1px solid;
+	
+    cursor: pointer;
+}
+
+.todo-env-label-ball {
+	height: 2.5em;;
+	width:  2.5em;
+
+    position: absolute;
+    top:      -1px;
+	left:     -1px;
+    
+    background-color: var(--tex1-color);
+    
+	border-radius: 1.25em;
+
+    transform: translateX(0.0em);
+}
+
+.todo-env-cb:checked + .todo-env-label .todo-env-label-ball {
+	transform: translateX(2.5em);
+}
+
 /* header style */
 
 header {
-    min-height: 20vh;
+    min-height: 15vh;
 
     display:         flex;
     justify-content: center;
@@ -75,7 +123,7 @@ header {
 /* input style */
 
 .todo-input-wrap {
-    min-height: 30vh;
+    min-height: 15vh;
 
     display:         flex;
     justify-content: center;
@@ -84,7 +132,7 @@ header {
 }
 
 .todo-input-item {
-    min-height: 20vh;
+    min-height: 15vh;
     min-width:  50vw;
 
     padding-left: 0.5em;
@@ -108,14 +156,13 @@ header {
 .todo-input-button-wrap {
     display:         flex;
     margin-left:     auto;
+
+    margin-top:      0.5em;
 }
 
 .todo-input-button {
-    margin-top: 0.5em;
-    padding:    0.25em;
-
-    min-width:  8.0em;
-    min-height: 2.0em;
+    width:  8.0em;
+    height: 2.5em;
 
     display:         flex;
     justify-content: space-evenly;
@@ -147,10 +194,8 @@ header {
 }
 
 .todo {
-    margin-top:    1.0em;
-    margin-bottom: 1.0em;
-
     min-width:  50vw;
+    min-height: 8.5vh;
 
     display:         flex;
     justify-content: center;
@@ -169,11 +214,10 @@ header {
 
 .todo-done-button {
     margin-right: 0.25em;
-    padding:      0.25em;
 
-    min-width:  5.0em;
-    min-height: 2.0em;
-
+    width:  5.0em;
+    height: 2.5em;
+    
     display:         flex;
     justify-content: space-evenly;
     align-items:     center;
@@ -188,10 +232,8 @@ header {
 }
 
 .todo-remove-button {
-    padding:      0.25em;
-
-    min-width:  5.0em;
-    min-height: 2.0em;
+    width:  5.0em;
+    height: 2.5em;
 
     display:         flex;
     justify-content: space-evenly;
@@ -204,7 +246,6 @@ header {
     color:            var(--tex2-color);
 
     cursor: pointer;
-
 }
 
 /* transforms */

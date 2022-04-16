@@ -13,6 +13,15 @@
     </head>
 
     <body class="light">
+        <div class="todo-env-wrap">
+            <input type="checkbox" class="todo-env-cb" id="todo-env-cb">
+            <label class="todo-env-label" for="todo-env-cb">
+                <span class="material-icons">light_mode</span>
+                <span class="material-icons">dark_mode</span>
+                <div class="todo-env-label-ball"></div> 
+            </label>
+        </div>
+
         <header>
             <h1>Todo</h1>
         </header>
@@ -20,10 +29,10 @@
         <form class="todo-input-wrap">
             <textarea class="todo-input-item" placeholder="Enter the todo"></textarea>
             <div class="todo-input-button-wrap">
-            <button class="todo-input-button">
-                <span class="material-icons md-20">add</span>
+            <a class="todo-input-button">
+                <span class="material-icons">add</span>
                 <span>Add</span>
-            </button>
+            </a>
             </div>
         </form>
 

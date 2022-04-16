@@ -6,6 +6,7 @@
 const todoInputItem   = document.querySelector('.todo-input-item');
 const todoInputButton = document.querySelector('.todo-input-button');
 const todoList        = document.querySelector('.todo-list');
+const todoEnvCB       = document.querySelector('.todo-env-cb');
 
 // listen events
 document
@@ -14,6 +15,8 @@ todoInputButton
     .addEventListener('click', todoAdd);
 todoList
     .addEventListener('click', todoHandle);
+todoEnvCB
+    .addEventListener('change', envThemeToogle);
 
 /// functions
 
@@ -46,14 +49,14 @@ function todoAdd(event) {
     todoSpan.innerText = todoContent;
 
     // make todo done button
-    todoDoneButton = document.createElement('button');
+    todoDoneButton = document.createElement('a');
     todoDoneButton.classList.add('todo-done-button');
-    todoDoneButton.innerHTML = '<span class="material-icons md-20">check</span>';
+    todoDoneButton.innerHTML = '<span class="material-icons">check</span>';
 
     // make todo remove button
-    todoRemoveButton = document.createElement('button');
+    todoRemoveButton = document.createElement('a');
     todoRemoveButton.classList.add('todo-remove-button');
-    todoRemoveButton.innerHTML = '<span class="material-icons md-20">delete</span>';
+    todoRemoveButton.innerHTML = '<span class="material-icons">delete</span>';
 
     // combine todo parts
     todo.appendChild(todoSpan);
@@ -176,14 +179,14 @@ function todoStorageLoad() {
         todoSpan.innerText = todoContent;
 
         // make todo done button
-        todoDoneButton = document.createElement('button');
+        todoDoneButton = document.createElement('a');
         todoDoneButton.classList.add('todo-done-button');
-        todoDoneButton.innerHTML = '<span class="material-icons md-20">check</span>';
+        todoDoneButton.innerHTML = '<span class="material-icons">check</span>';
 
         // make todo remove button
-        todoRemoveButton = document.createElement('button');
+        todoRemoveButton = document.createElement('a');
         todoRemoveButton.classList.add('todo-remove-button');
-        todoRemoveButton.innerHTML = '<span class="material-icons md-20">delete</span>';
+        todoRemoveButton.innerHTML = '<span class="material-icons">delete</span>';
 
         // combine todo parts
         todo.appendChild(todoSpan);
@@ -197,4 +200,10 @@ function todoStorageLoad() {
         if (todoState == 'done')
             todo.classList.toggle('done');
     });
+}
+
+// toogle environment theme
+function envThemeToogle() {
+    document.body.classList.toggle('dark');
+    document.body.classList.toggle('light');
 }
