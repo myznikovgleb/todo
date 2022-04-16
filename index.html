@@ -17,23 +17,17 @@
             <h1>Todo</h1>
         </header>
 
-        <form>
-            <div class="todo-input-wrapper">
-                <input class="todo-input"></input>
-                <button class="todo-add-button"><span class="material-icons">add</span></button>
-            </div>
-            <div class="todo-select-wrapper">
-                <select name="todo-select" class="todo-select">
-                    <option value="all">All</option>
-                    <option value="completed">Done</option>
-                    <option value="uncompleted">Undone</option>
-                </select>
+        <form class="todo-input-wrap">
+            <textarea class="todo-input-item" placeholder="Enter the todo"></textarea>
+            <div class="todo-input-button-wrap">
+            <button class="todo-input-button">
+                <span class="material-icons md-20">add</span>
+                <span>Add</span>
+            </button>
             </div>
         </form>
 
-        <div class="todo-container">
-            <ul class="todo-list">
-            </ul>
+        <div class="todo-list">
         </div>
 
         <script src="./app.js"> </script>
