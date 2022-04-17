@@ -7,6 +7,7 @@ const todoInputItem   = document.querySelector('.todo-input-item');
 const todoInputButton = document.querySelector('.todo-input-button');
 const todoList        = document.querySelector('.todo-list');
 const todoEnvCB       = document.querySelector('.todo-env-cb');
+const todoHeader      = document.querySelector('.todo-list-header');
 
 // listen events
 document
@@ -17,6 +18,9 @@ todoList
     .addEventListener('click', todoHandle);
 todoEnvCB
     .addEventListener('change', envThemeToogle);
+todoHeader
+    .addEventListener('click', editHeader);
+
 
 /// functions
 
@@ -206,4 +210,21 @@ function todoStorageLoad() {
 function envThemeToogle() {
     document.body.classList.toggle('dark');
     document.body.classList.toggle('light');
+}
+
+// edit header of list
+function editHeader() {
+    let todoHeaderTA;
+    
+    todoHeaderTA = document.createElement('textarea');
+    todoHeaderTA.value = todoHeader.innerHTML;
+    todoHeaderTA.classList.add('todo-list-header-ta')
+    
+    todoHeader.replaceWith(todoHeaderTA);
+
+    todoHeaderTA.addEventListener('blur', function() {
+        todoHeader.innerHTML = todoHeaderTA.value;
+
+        todoHeaderTA.replaceWith(todoHeader);
+    });
 }
