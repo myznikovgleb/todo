@@ -13,7 +13,7 @@
 }
 
 ::placeholder {
-    color:   var(--tex3-color);
+    color:   var(--tex4-color);
     opacity: 1;
 }
 
@@ -24,9 +24,12 @@
     --brdr-color: #bdbdbd;
     --tex1-color: #000000;
     --tex2-color: #ffffff;
-    --tex3-color: #bdbdbd;
+    --tex3-color: rgba(255, 255, 255, 0.95);
+    --tex4-color: #bdbdbd;
     --acp1-color: #22a44a;
     --acp2-color: #119339;
+    --acp3-color: #84c494;
+    --acp4-color: #74b484;
     --rjc1-color: #cc2525;
     --rjc2-color: #bb1414;
 }
@@ -36,9 +39,12 @@
     --brdr-color: #bdbdbd;
     --tex1-color: #ffffff;
     --tex2-color: #ffffff;
-    --tex3-color: #e1e1e1;
+    --tex3-color: rgba(255, 255, 255, 0.95);
+    --tex4-color: #e1e1e1;
     --acp1-color: #22a44a;
     --acp2-color: #119339;
+    --acp3-color: #64a474;
+    --acp4-color: #549464;
     --rjc1-color: #cc2525;
     --rjc2-color: #bb1414;    
 }
@@ -192,6 +198,16 @@ header {
     color:            var(--tex2-color);
 
     cursor: pointer;
+}
+
+.todo-input-button.disable {
+    border:        var(--acp4-color) 1px solid;
+    border-radius: 0.25em;
+
+    background-color: var(--acp3-color);
+    color:            var(--tex3-color);
+
+    cursor: default;    
 }
 
 .todo-input-button span:nth-child(2) {

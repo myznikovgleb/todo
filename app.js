@@ -14,6 +14,8 @@ document
     .addEventListener('DOMContentLoaded', todoHeaderStorageLoad);
 document
     .addEventListener('DOMContentLoaded', todoStorageLoad);
+todoInputItem
+    .addEventListener('input', todoInputButtonToogle);
 todoInputButton
     .addEventListener('click', todoAdd);
 todoList
@@ -38,6 +40,10 @@ function todoAdd(event) {
 
     // prevent default submitting
     event.preventDefault();
+
+    // forbid empty todo
+    if (todoInputItem.value == '')
+        return; 
 
     // make todo
     todo = document.createElement('div');
@@ -71,6 +77,9 @@ function todoAdd(event) {
 
     // add todo to list
     todoList.appendChild(todo);
+
+    // disable todo input button 
+    todoInputButton.classList.add('disable');
     
     // get session storage todos
     if (sessionStorage.getItem('todoStorage') === null) {
@@ -235,7 +244,7 @@ function todoHeaderEdit() {
     });
 }
 
-// 
+// load session storage header
 function todoHeaderStorageLoad() {
      // get session storage header
     if (sessionStorage.getItem('todoHeader') == null) {
@@ -248,4 +257,15 @@ function todoHeaderStorageLoad() {
         todoHeader.innerHTML = todoHeaderStorage;
         return;
     }
+}
+
+// toogle todo input button
+function todoInputButtonToogle() {
+    if ((todoInputItem.value == '') && !(todoInputButton.classList.contains('disable'))) {
+        todoInputButton.classList.add('disable'); 
+    }
+    else if (!(todoInputItem.value == '') && (todoInputButton.classList.contains('disable'))) {
+        todoInputButton.classList.remove('disable');
+    }
+    return;
 }
