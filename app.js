@@ -11,6 +11,8 @@ const todoHeader      = document.querySelector('.todo-list-header');
 
 // listen events
 document
+    .addEventListener('DOMContentLoaded', todoHeaderStorageLoad);
+document
     .addEventListener('DOMContentLoaded', todoStorageLoad);
 todoInputButton
     .addEventListener('click', todoAdd);
@@ -19,7 +21,7 @@ todoList
 todoEnvCB
     .addEventListener('change', envThemeToogle);
 todoHeader
-    .addEventListener('click', editHeader);
+    .addEventListener('click', todoHeaderEdit);
 
 
 /// functions
@@ -213,9 +215,10 @@ function envThemeToogle() {
 }
 
 // edit header of list
-function editHeader() {
+function todoHeaderEdit() {
     let todoHeaderTA;
-    
+
+    // replace header with text area
     todoHeaderTA = document.createElement('textarea');
     todoHeaderTA.value = todoHeader.innerHTML;
     todoHeaderTA.classList.add('todo-list-header-ta')
@@ -223,8 +226,26 @@ function editHeader() {
     todoHeader.replaceWith(todoHeaderTA);
 
     todoHeaderTA.addEventListener('blur', function() {
+        // replace text area with header
         todoHeader.innerHTML = todoHeaderTA.value;
-
         todoHeaderTA.replaceWith(todoHeader);
+
+        // update session storage header
+        sessionStorage.setItem('todoHeader', JSON.stringify(todoHeader.innerHTML));
     });
+}
+
+// 
+function todoHeaderStorageLoad() {
+     // get session storage header
+    if (sessionStorage.getItem('todoHeader') == null) {
+        return;
+    }
+    else {
+        // replace header with session storage header
+        let todoHeaderStorage;
+        todoHeaderStorage = JSON.parse(sessionStorage.getItem('todoHeader'));
+        todoHeader.innerHTML = todoHeaderStorage;
+        return;
+    }
 }
