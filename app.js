@@ -16,6 +16,8 @@ document
     .addEventListener('DOMContentLoaded', todoStorageLoad);
 todoInputItem
     .addEventListener('input', todoInputButtonToogle);
+todoInputItem
+    .addEventListener('keydown', todoAdd);
 todoInputButton
     .addEventListener('click', todoAdd);
 todoList
@@ -38,8 +40,20 @@ function todoAdd(event) {
     let todoRemoveButton;
     let todoStorage;
 
-    // prevent default submitting
-    event.preventDefault();
+    if (event instanceof KeyboardEvent) {
+        if (event.key == 'Enter') {
+        // prevent default behavior
+        event.preventDefault();
+        }
+        else {
+            // do nothing
+            return;
+        }
+    }
+    else if (event instanceof MouseEvent) {
+        // prevent default behavior
+        event.preventDefault();
+    }
 
     // forbid empty todo
     if (todoInputItem.value == '')
@@ -158,7 +172,7 @@ function todoHandle(event) {
 }
 
 // load session storage todos
-function todoStorageLoad() {
+function todoStorageLoad(event) {
     let todoStorage;
 
     // get session storage todos
@@ -245,7 +259,7 @@ function todoHeaderEdit() {
 }
 
 // load session storage header
-function todoHeaderStorageLoad() {
+function todoHeaderStorageLoad(event) {
      // get session storage header
     if (sessionStorage.getItem('todoHeader') == null) {
         return;
@@ -260,7 +274,7 @@ function todoHeaderStorageLoad() {
 }
 
 // toogle todo input button
-function todoInputButtonToogle() {
+function todoInputButtonToogle(event) {
     if ((todoInputItem.value == '') && !(todoInputButton.classList.contains('disable'))) {
         todoInputButton.classList.add('disable'); 
     }
