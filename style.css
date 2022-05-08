@@ -233,6 +233,20 @@ header {
     display:         flex;
     justify-content: center;
     align-items:     center;
+
+    position: static;
+    z-index:  auto;
+
+    user-select: none;
+}
+
+.shadow {
+    opacity: 0.0;
+}
+
+.dragged {
+    position: absolute;
+    z-index:  100;
 }
 
 .todo-span {
@@ -243,6 +257,12 @@ header {
     flex-grow: 4;
 
     font-size: 1.5em;
+
+    cursor: pointer;
+}
+
+.pointerEventsNone {
+    pointer-events: none;
 }
 
 .todo-done-button {
