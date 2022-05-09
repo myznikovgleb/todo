@@ -6,8 +6,12 @@
 const todoInputItem   = document.querySelector('.todo-input-item');
 const todoInputButton = document.querySelector('.todo-input-button');
 const todoList        = document.querySelector('.todo-list');
-const todoEnvCB       = document.querySelector('.todo-env-cb');
+const todoEnvThemeCB  = document.querySelector('.todo-env-theme-cb');
+const todoEnvPageCB   = document.querySelector('.todo-env-page-cb');
 const todoHeader      = document.querySelector('.todo-list-header');
+const todoPagesCanvas = document.querySelector('.todo-pages-canvas');
+const todoPage        = document.querySelector('.todo-page');
+const todoPageHeader  = document.querySelector('.todo-page-header');
 
 // listen events
 document
@@ -22,10 +26,14 @@ todoInputButton
     .addEventListener('click', todoAdd);
 todoList
     .addEventListener('click', todoHandle);
-todoEnvCB
+todoEnvThemeCB
     .addEventListener('change', envThemeToogle);
+todoEnvPageCB
+    .addEventListener('change', envPageToogle);
 todoHeader
     .addEventListener('click', todoHeaderEdit);
+todoPage
+    .addEventListener('click', todoPagePick);
 
 /// functions
 
@@ -237,9 +245,14 @@ function todoStorageLoad(event) {
 }
 
 // toogle environment theme
-function envThemeToogle() {
+function envThemeToogle(event) {
     document.body.classList.toggle('dark');
     document.body.classList.toggle('light');
+}
+
+// toogle environment pages
+function envPageToogle(event) {
+    todoPagesCanvas.classList.toggle('hidden');
 }
 
 // edit header of list
@@ -260,6 +273,9 @@ function todoHeaderEdit() {
 
         // update session storage header
         sessionStorage.setItem('todoHeader', JSON.stringify(todoHeader.innerHTML));
+
+        // update todo page header
+        todoPageHeader.innerHTML = todoHeader.innerHTML;
     });
 }
 
@@ -274,6 +290,7 @@ function todoHeaderStorageLoad(event) {
         let todoHeaderStorage;
         todoHeaderStorage = JSON.parse(sessionStorage.getItem('todoHeader'));
         todoHeader.innerHTML = todoHeaderStorage;
+        todoPageHeader.innerHTML = todoHeaderStorage;
         return;
     }
 }
@@ -437,4 +454,9 @@ function todoFromPoint(X, Y) {
     else {
         return todoDragged;
     }
+}
+
+// pick current todo page
+function todoPagePick(event) {
+    todoPagesCanvas.classList.toggle('hidden');
 }

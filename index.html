@@ -14,11 +14,15 @@
 
     <body class="light">
         <div class="todo-env-wrap">
-            <input type="checkbox" class="todo-env-cb" id="todo-env-cb">
-            <label class="todo-env-label" for="todo-env-cb">
+            <input type="checkbox" class="todo-env-theme-cb" id="todo-env-theme-cb">
+            <label class="todo-env-theme-label" for="todo-env-cb">
                 <span class="material-icons">light_mode</span>
                 <span class="material-icons">dark_mode</span>
-                <div class="todo-env-label-ball"></div> 
+                <div class="todo-env-theme-label-ball"></div> 
+            </label>
+            <input type="checkbox" class="todo-env-page-cb" id="todo-env-page-cb">
+            <label class="todo-env-page-label" for="todo-env-page-cb">
+                <span class="material-icons">menu</span>
             </label>
         </div>
 
@@ -37,6 +41,15 @@
         </form>
 
         <div class="todo-list">
+        </div>
+
+        <div class="todo-pages-canvas hidden">
+            <div class="todo-pages">
+                <div class="todo-page">
+                    <span class="todo-page-header">Todo</span>
+                    <span class="material-icons huge">list</span>
+                </div>
+            </div>
         </div>
 
         <script src="./app.js"> </script>
