@@ -41,6 +41,7 @@ todoPage
 function todoAdd(event) {
     let todo;
     let todoContent
+    let todoTag;
     let todoState;
     let todoSpan;
     let todoDoneButton;
@@ -62,16 +63,17 @@ function todoAdd(event) {
         event.preventDefault();
     }
 
+    // extract todo content and tag
+    todoContent = extractContent(todoInputItem.value);
+    todoTag     = extractTag(todoInputItem.value);
+
     // forbid empty todo
-    if (todoInputItem.value == '')
+    if (todoContent == '')
         return; 
 
     // make todo
     todo = document.createElement('div');
     todo.classList.add('todo');
-
-    // make todo content
-    todoContent = todoInputItem.value;
 
     // make todo state
     todoState = 'default';
@@ -116,7 +118,8 @@ function todoAdd(event) {
     // update session storage todos
     todoStorage.push({
         content: todoContent,
-        state: todoState
+        tag:     todoTag,
+        state:   todoState
     });
     sessionStorage.setItem('todoStorage', JSON.stringify(todoStorage));
 
@@ -399,14 +402,34 @@ function todoDrop(event) {
     else {
         // do nothing
     }
+
+    // get session storage todos
+    if (sessionStorage.getItem('todoStorage') === null) {
+        todoStorage = [];
+    }
+    else {
+        todoStorage = JSON.parse(sessionStorage.getItem('todoStorage'));
+    }
     
     // update session storage todos
-    todoStorage = [];
-    for (let i = 1; i < todoList.childNodes.length; i++) {
-        todoStorage.push({
-            content: todoList.childNodes[i].childNodes[0].innerHTML,
-            state: (todoList.childNodes[i].classList.contains('done')) ? 'done' : 'default'
-        });
+    if (todoIndex < targetIndex) {
+        // go down with swaps
+        for (let i = todoIndex; i < targetIndex; i++) {
+            let blank = todoStorage[i-1];
+            todoStorage[i-1] = todoStorage[i];
+            todoStorage[i]   = blank;
+        }
+    }
+    else if (todoIndex > targetIndex) {
+        // go up with swaps
+        for (let i = todoIndex; i > targetIndex; i--) {
+            let blank = todoStorage[i-2];
+            todoStorage[i-2] = todoStorage[i-1];
+            todoStorage[i-1] = blank;
+        }
+    }
+    else {
+        // do nothing
     }
     sessionStorage.setItem('todoStorage', JSON.stringify(todoStorage));
 
@@ -459,4 +482,50 @@ function todoFromPoint(X, Y) {
 // pick current todo page
 function todoPagePick(event) {
     todoPagesCanvas.classList.toggle('hidden');
+}
+
+// extract content from string
+function extractContent(string) {
+    let content;
+
+    const contentRE = /:[\w|\s]*/i;
+    const wsRE      = /\s/;
+
+    // extract content from string
+    content = contentRE.exec(string);
+
+    // release column symbol
+    if (content === null) {
+        content = string;
+    }
+    else {
+        content = content[0].replace(':', '');
+        if (wsRE.test(content))
+            content = '';
+    }
+
+    return content;
+}
+
+// extract tag from string
+function extractTag(string) {
+    let tag;
+
+    const tagRE = /[\w|\s]*:/i;
+    const wsRE  = /\s/;
+
+    // extract tag from string
+    tag = tagRE.exec(string);
+
+    // release column symbol
+    if (tag === null) {
+        tag = '';
+    }
+    else {
+        tag = tag[0].replace(':', '');
+        if (wsRE.test(tag))
+            tag = '';
+    }
+
+    return tag;
 }
