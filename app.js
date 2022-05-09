@@ -44,6 +44,7 @@ function todoAdd(event) {
     let todoTag;
     let todoState;
     let todoSpan;
+    let todoToolTip;
     let todoDoneButton;
     let todoRemoveButton;
     let todoStorage;
@@ -78,6 +79,11 @@ function todoAdd(event) {
     // make todo state
     todoState = 'default';
 
+    // make todo tooltip
+    todoToolTip = document.createElement('span');
+    todoToolTip.classList.add('todo-tooltip');
+    todoToolTip.innerHTML = todoTag;
+
     // make todo span
     todoSpan = document.createElement('span');
     todoSpan.classList.add('todo-span');
@@ -94,6 +100,8 @@ function todoAdd(event) {
     todoRemoveButton.innerHTML = '<span class="material-icons">delete</span>';
 
     // combine todo parts
+    if (todoTag)
+        todo.appendChild(todoToolTip);
     todo.appendChild(todoSpan);
     todo.appendChild(todoDoneButton);
     todo.appendChild(todoRemoveButton);
@@ -200,8 +208,10 @@ function todoStorageLoad(event) {
     todoStorage.forEach(function(todoStorageItem) {
         let todo;
         let todoContent
+        let todoTag;
         let todoState;
         let todoSpan;
+        let todoToolTip;
         let todoDoneButton;
         let todoRemoveButton;
     
@@ -212,8 +222,16 @@ function todoStorageLoad(event) {
         // make todo content
         todoContent = todoStorageItem.content;
 
+        // make todo tag
+        todoTag = todoStorageItem.tag;
+
         // make todo state
         todoState = todoStorageItem.state;
+
+        // make todo tooltip
+        todoToolTip = document.createElement('span');
+        todoToolTip.classList.add('todo-tooltip');
+        todoToolTip.innerHTML = todoTag;
 
         // make todo span
         todoSpan = document.createElement('span');
@@ -231,6 +249,8 @@ function todoStorageLoad(event) {
         todoRemoveButton.innerHTML = '<span class="material-icons">delete</span>';
 
         // combine todo parts
+        if (todoTag)
+            todo.appendChild(todoToolTip);
         todo.appendChild(todoSpan);
         todo.appendChild(todoDoneButton);
         todo.appendChild(todoRemoveButton);

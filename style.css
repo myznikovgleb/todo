@@ -27,6 +27,7 @@
 .light {
     --bac1-color: #f7f7f7;
     --bac2-color: rgba(247, 247, 247, 0.85);
+    --ttip-color: #e1e1e1;
     --brdr-color: #bdbdbd;
     --tex1-color: #000000;
     --tex2-color: #ffffff;
@@ -43,6 +44,7 @@
 .dark {
     --bac1-color: #25252f;
     --bac2-color: rgba( 37,  37,  47, 0.85);
+    --ttip-color: #4f5566;
     --brdr-color: #bdbdbd;
     --tex1-color: #ffffff;
     --tex2-color: #ffffff;
@@ -268,8 +270,7 @@ header {
     justify-content: center;
     align-items:     center;
 
-    position: static;
-    z-index:  auto;
+    position: relative;
 
     user-select: none;
 }
@@ -281,6 +282,44 @@ header {
 .dragged {
     position: absolute;
     z-index:  100;
+}
+
+.todo-tooltip {
+    min-width:  40px;
+    height:     20px;
+
+    position: absolute;
+    right:    105%;
+    z-index:  1;
+
+    background-color: var(--ttip-color);
+    color:            var(--tex1-color);
+
+    border-radius: 0.5em;
+
+    font-size:  0.75em;
+    text-align: center;
+    padding:    2px 4px 2px 4px;
+
+    visibility: hidden;
+}
+
+.todo-tooltip::after {
+    content: " ";
+    
+    margin-top: -5px;
+
+    position: absolute;
+    top:   50%;
+    left: 100%;
+
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent transparent transparent var(--ttip-color);
+}
+
+.todo:hover>.todo-tooltip {
+    visibility: visible;
 }
 
 .todo-span {
@@ -394,6 +433,6 @@ header {
 
 /* transforms */
 
-.done>span {
+.done>.todo-span {
     text-decoration: line-through;
 }
