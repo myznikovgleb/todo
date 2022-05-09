@@ -318,7 +318,7 @@ header {
     border-color: transparent transparent transparent var(--ttip-color);
 }
 
-.todo:hover>.todo-tooltip {
+.todo-tooltip.visible {
     visibility: visible;
 }
 

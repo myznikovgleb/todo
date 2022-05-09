@@ -19,7 +19,7 @@ document
 document
     .addEventListener('DOMContentLoaded', todoStorageLoad);
 todoInputItem
-    .addEventListener('input', todoInputButtonToogle);
+    .addEventListener('input', todoInputButtonToggle);
 todoInputItem
     .addEventListener('keydown', todoAdd);
 todoInputButton
@@ -27,9 +27,9 @@ todoInputButton
 todoList
     .addEventListener('click', todoHandle);
 todoEnvThemeCB
-    .addEventListener('change', envThemeToogle);
+    .addEventListener('change', envThemeToggle);
 todoEnvPageCB
-    .addEventListener('change', envPageToogle);
+    .addEventListener('change', envPageToggle);
 todoHeader
     .addEventListener('click', todoHeaderEdit);
 todoPage
@@ -111,6 +111,12 @@ function todoAdd(event) {
 
     // allow to pick todo
     todoSpan.addEventListener('mousedown', todoPick);
+
+    // allow to show tooltip of todo subset
+    todoSpan.addEventListener('mouseover', todoSubsetTooltipToggle);
+
+    // allow to hide tooltip of todo subset
+    todoSpan.addEventListener('mouseout', todoSubsetTooltipToggle);
 
     // disable todo input button 
     todoInputButton.classList.add('disable');
@@ -264,17 +270,23 @@ function todoStorageLoad(event) {
 
         // allow to pick todo
         todoSpan.addEventListener('mousedown', todoPick);
+
+        // allow to show tooltip of todo subset
+        todoSpan.addEventListener('mouseover', todoSubsetTooltipToggle);
+
+        // allow to hide tooltip of todo subset
+        todoSpan.addEventListener('mouseout', todoSubsetTooltipToggle);
     });
 }
 
-// toogle environment theme
-function envThemeToogle(event) {
+// toggle environment theme
+function envThemeToggle(event) {
     document.body.classList.toggle('dark');
     document.body.classList.toggle('light');
 }
 
-// toogle environment pages
-function envPageToogle(event) {
+// toggle environment pages
+function envPageToggle(event) {
     todoPagesCanvas.classList.toggle('hidden');
 }
 
@@ -318,8 +330,8 @@ function todoHeaderStorageLoad(event) {
     }
 }
 
-// toogle todo input button
-function todoInputButtonToogle(event) {
+// toggle todo input button
+function todoInputButtonToggle(event) {
     if ((todoInputItem.value == '') && !(todoInputButton.classList.contains('disable'))) {
         todoInputButton.classList.add('disable'); 
     }
@@ -520,8 +532,6 @@ function extractContent(string) {
     }
     else {
         content = content[0].replace(':', '');
-        if (wsRE.test(content))
-            content = '';
     }
 
     return content;
@@ -549,3 +559,18 @@ function extractTag(string) {
 
     return tag;
 }
+
+// toggle tooltip of todo subset
+function todoSubsetTooltipToggle(event) {
+    let todoTag;
+
+    // get todo tag
+    todoTag = event.target.parentElement.childNodes[0].innerHTML;
+
+    // toggle subset tooltip
+    for (let i = 1; i < todoList.childNodes.length; i++)
+        if (todoList.childNodes[i].childNodes[0].innerHTML == todoTag)
+            todoList.childNodes[i].childNodes[0].classList.toggle('visible');
+
+    return;
+};
