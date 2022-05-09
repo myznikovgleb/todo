@@ -19,7 +19,7 @@ document
 document
     .addEventListener('DOMContentLoaded', todoStorageLoad);
 todoInputItem
-    .addEventListener('input', todoInputButtonToogle);
+    .addEventListener('input', todoInputButtonToggle);
 todoInputItem
     .addEventListener('keydown', todoAdd);
 todoInputButton
@@ -27,9 +27,9 @@ todoInputButton
 todoList
     .addEventListener('click', todoHandle);
 todoEnvThemeCB
-    .addEventListener('change', envThemeToogle);
+    .addEventListener('change', envThemeToggle);
 todoEnvPageCB
-    .addEventListener('change', envPageToogle);
+    .addEventListener('change', envPageToggle);
 todoHeader
     .addEventListener('click', todoHeaderEdit);
 todoPage
@@ -41,8 +41,10 @@ todoPage
 function todoAdd(event) {
     let todo;
     let todoContent
+    let todoTag;
     let todoState;
     let todoSpan;
+    let todoToolTip;
     let todoDoneButton;
     let todoRemoveButton;
     let todoStorage;
@@ -62,19 +64,25 @@ function todoAdd(event) {
         event.preventDefault();
     }
 
+    // extract todo content and tag
+    todoContent = extractContent(todoInputItem.value);
+    todoTag     = extractTag(todoInputItem.value);
+
     // forbid empty todo
-    if (todoInputItem.value == '')
+    if (todoContent == '')
         return; 
 
     // make todo
     todo = document.createElement('div');
     todo.classList.add('todo');
 
-    // make todo content
-    todoContent = todoInputItem.value;
-
     // make todo state
     todoState = 'default';
+
+    // make todo tooltip
+    todoToolTip = document.createElement('span');
+    todoToolTip.classList.add('todo-tooltip');
+    todoToolTip.innerHTML = todoTag;
 
     // make todo span
     todoSpan = document.createElement('span');
@@ -92,6 +100,8 @@ function todoAdd(event) {
     todoRemoveButton.innerHTML = '<span class="material-icons">delete</span>';
 
     // combine todo parts
+    if (todoTag)
+        todo.appendChild(todoToolTip);
     todo.appendChild(todoSpan);
     todo.appendChild(todoDoneButton);
     todo.appendChild(todoRemoveButton);
@@ -101,6 +111,12 @@ function todoAdd(event) {
 
     // allow to pick todo
     todoSpan.addEventListener('mousedown', todoPick);
+
+    // allow to show tooltip of todo subset
+    todoSpan.addEventListener('mouseover', todoSubsetTooltipToggle);
+
+    // allow to hide tooltip of todo subset
+    todoSpan.addEventListener('mouseout', todoSubsetTooltipToggle);
 
     // disable todo input button 
     todoInputButton.classList.add('disable');
@@ -116,7 +132,8 @@ function todoAdd(event) {
     // update session storage todos
     todoStorage.push({
         content: todoContent,
-        state: todoState
+        tag:     todoTag,
+        state:   todoState
     });
     sessionStorage.setItem('todoStorage', JSON.stringify(todoStorage));
 
@@ -197,8 +214,10 @@ function todoStorageLoad(event) {
     todoStorage.forEach(function(todoStorageItem) {
         let todo;
         let todoContent
+        let todoTag;
         let todoState;
         let todoSpan;
+        let todoToolTip;
         let todoDoneButton;
         let todoRemoveButton;
     
@@ -209,8 +228,16 @@ function todoStorageLoad(event) {
         // make todo content
         todoContent = todoStorageItem.content;
 
+        // make todo tag
+        todoTag = todoStorageItem.tag;
+
         // make todo state
         todoState = todoStorageItem.state;
+
+        // make todo tooltip
+        todoToolTip = document.createElement('span');
+        todoToolTip.classList.add('todo-tooltip');
+        todoToolTip.innerHTML = todoTag;
 
         // make todo span
         todoSpan = document.createElement('span');
@@ -228,6 +255,8 @@ function todoStorageLoad(event) {
         todoRemoveButton.innerHTML = '<span class="material-icons">delete</span>';
 
         // combine todo parts
+        if (todoTag)
+            todo.appendChild(todoToolTip);
         todo.appendChild(todoSpan);
         todo.appendChild(todoDoneButton);
         todo.appendChild(todoRemoveButton);
@@ -241,17 +270,23 @@ function todoStorageLoad(event) {
 
         // allow to pick todo
         todoSpan.addEventListener('mousedown', todoPick);
+
+        // allow to show tooltip of todo subset
+        todoSpan.addEventListener('mouseover', todoSubsetTooltipToggle);
+
+        // allow to hide tooltip of todo subset
+        todoSpan.addEventListener('mouseout', todoSubsetTooltipToggle);
     });
 }
 
-// toogle environment theme
-function envThemeToogle(event) {
+// toggle environment theme
+function envThemeToggle(event) {
     document.body.classList.toggle('dark');
     document.body.classList.toggle('light');
 }
 
-// toogle environment pages
-function envPageToogle(event) {
+// toggle environment pages
+function envPageToggle(event) {
     todoPagesCanvas.classList.toggle('hidden');
 }
 
@@ -295,8 +330,8 @@ function todoHeaderStorageLoad(event) {
     }
 }
 
-// toogle todo input button
-function todoInputButtonToogle(event) {
+// toggle todo input button
+function todoInputButtonToggle(event) {
     if ((todoInputItem.value == '') && !(todoInputButton.classList.contains('disable'))) {
         todoInputButton.classList.add('disable'); 
     }
@@ -399,14 +434,34 @@ function todoDrop(event) {
     else {
         // do nothing
     }
+
+    // get session storage todos
+    if (sessionStorage.getItem('todoStorage') === null) {
+        todoStorage = [];
+    }
+    else {
+        todoStorage = JSON.parse(sessionStorage.getItem('todoStorage'));
+    }
     
     // update session storage todos
-    todoStorage = [];
-    for (let i = 1; i < todoList.childNodes.length; i++) {
-        todoStorage.push({
-            content: todoList.childNodes[i].childNodes[0].innerHTML,
-            state: (todoList.childNodes[i].classList.contains('done')) ? 'done' : 'default'
-        });
+    if (todoIndex < targetIndex) {
+        // go down with swaps
+        for (let i = todoIndex; i < targetIndex; i++) {
+            let blank = todoStorage[i-1];
+            todoStorage[i-1] = todoStorage[i];
+            todoStorage[i]   = blank;
+        }
+    }
+    else if (todoIndex > targetIndex) {
+        // go up with swaps
+        for (let i = todoIndex; i > targetIndex; i--) {
+            let blank = todoStorage[i-2];
+            todoStorage[i-2] = todoStorage[i-1];
+            todoStorage[i-1] = blank;
+        }
+    }
+    else {
+        // do nothing
     }
     sessionStorage.setItem('todoStorage', JSON.stringify(todoStorage));
 
@@ -460,3 +515,62 @@ function todoFromPoint(X, Y) {
 function todoPagePick(event) {
     todoPagesCanvas.classList.toggle('hidden');
 }
+
+// extract content from string
+function extractContent(string) {
+    let content;
+
+    const contentRE = /:[\w|\s]*/i;
+    const wsRE      = /\s/;
+
+    // extract content from string
+    content = contentRE.exec(string);
+
+    // release column symbol
+    if (content === null) {
+        content = string;
+    }
+    else {
+        content = content[0].replace(':', '');
+    }
+
+    return content;
+}
+
+// extract tag from string
+function extractTag(string) {
+    let tag;
+
+    const tagRE = /[\w|\s]*:/i;
+    const wsRE  = /\s/;
+
+    // extract tag from string
+    tag = tagRE.exec(string);
+
+    // release column symbol
+    if (tag === null) {
+        tag = '';
+    }
+    else {
+        tag = tag[0].replace(':', '');
+        if (wsRE.test(tag))
+            tag = '';
+    }
+
+    return tag;
+}
+
+// toggle tooltip of todo subset
+function todoSubsetTooltipToggle(event) {
+    let todoTag;
+
+    // get todo tag
+    todoTag = event.target.parentElement.childNodes[0].innerHTML;
+
+    // toggle subset tooltip
+    for (let i = 1; i < todoList.childNodes.length; i++)
+        if (todoList.childNodes[i].childNodes[0].innerHTML == todoTag)
+            todoList.childNodes[i].childNodes[0].classList.toggle('visible');
+
+    return;
+};
