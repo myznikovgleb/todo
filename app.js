@@ -2,6 +2,10 @@
 
 /// main
 
+// database vars
+const todoDBName = 'todoDB';
+const todoDBVersion = 1;
+
 // query objects
 const todoInputItem   = document.querySelector('.todo-input-item');
 const todoInputButton = document.querySelector('.todo-input-button');
@@ -15,9 +19,9 @@ const todoPageHeader  = document.querySelector('.todo-page-header');
 
 // listen events
 document
-    .addEventListener('DOMContentLoaded', todoHeaderStorageLoad);
+    .addEventListener('DOMContentLoaded', todoHeaderDBLoad);
 document
-    .addEventListener('DOMContentLoaded', todoStorageLoad);
+    .addEventListener('DOMContentLoaded', todoDBLoad);
 todoInputItem
     .addEventListener('input', todoInputButtonToggle);
 todoInputItem
@@ -47,7 +51,9 @@ function todoAdd(event) {
     let todoToolTip;
     let todoDoneButton;
     let todoRemoveButton;
-    let todoStorage;
+    let todoDB;
+    let todoDBRequest;
+    let todoStore;
 
     if (event instanceof KeyboardEvent) {
         if (event.key == 'Enter') {
@@ -120,22 +126,43 @@ function todoAdd(event) {
 
     // disable todo input button 
     todoInputButton.classList.add('disable');
-    
-    // get session storage todos
-    if (sessionStorage.getItem('todoStorage') === null) {
-        todoStorage = [];
-    }
-    else {
-        todoStorage = JSON.parse(sessionStorage.getItem('todoStorage'));
-    }
-    
-    // update session storage todos
-    todoStorage.push({
-        content: todoContent,
-        tag:     todoTag,
-        state:   todoState
-    });
-    sessionStorage.setItem('todoStorage', JSON.stringify(todoStorage));
+
+    // make request to todo database
+    todoDBRequest = window.indexedDB.open(todoDBName, todoDBVersion);
+
+    // create todo store at todo database
+    todoDBRequest.onupgradeneeded = event => {
+        todoDB = event.target.result;
+        todoDB.createObjectStore('todoStore', {autoIncrement: true});
+        todoDB.createObjectStore('todoHeaderStore', {autoIncrement: true});
+    };
+
+    // add todo to todo store
+    todoDBRequest.onsuccess = event => {
+        let todos = [];
+        todoDB = event.target.result;
+        
+        let todoDBtransaction = todoDB.transaction(['todoStore'], 'readwrite');
+        todoStore = todoDBtransaction.objectStore('todoStore');
+        
+        todoStore.openCursor().onsuccess = event => {
+            if (event.target.result) {
+                todos.push(event.target.result.value);
+                event.target.result.continue();
+            }
+            else {
+                todoStore.clear();
+                todos.push({
+                    content: todoContent,
+                    tag:     todoTag,
+                    state:   todoState
+                });
+                todos.forEach(function(todo) {
+                    todoStore.add(todo);
+                });
+            }
+        };
+    };
 
     // release todo input
     todoInputItem.value = '';
@@ -148,21 +175,37 @@ function todoHandle(event) {
     // toggle todo
     if (event.target.classList[0] == 'todo-done-button') {
         let todo = event.target.parentElement;
-        let todoStorage;
+        let todoDB;
+        let todoDBRequest;
+        let todoStore;
 
-        // get session storage todos
-        if (sessionStorage.getItem('todoStorage') === null) {
-            todoStorage = [];
-        }
-        else {
-            todoStorage = JSON.parse(sessionStorage.getItem('todoStorage'));
-        }
+        // make request to todo database
+        todoDBRequest = window.indexedDB.open(todoDBName, todoDBVersion);
 
-        // update session storage todos
-        for (let i = 1; i < todoList.childNodes.length; i++)
-            if (todoList.childNodes[i] === todo)
-                todoStorage[i-1].state == 'default' ? todoStorage[i-1].state = 'done' : todoStorage[i-1].state = 'default';
-        sessionStorage.setItem('todoStorage', JSON.stringify(todoStorage));
+        // toggle todo at todo store
+        todoDBRequest.onsuccess = event => {
+            let todos = [];
+            todoDB = event.target.result;
+        
+            let todoDBtransaction = todoDB.transaction(['todoStore'], 'readwrite');
+            todoStore = todoDBtransaction.objectStore('todoStore');
+        
+            todoStore.openCursor().onsuccess = event => {
+                if (event.target.result) {
+                    todos.push(event.target.result.value);
+                    event.target.result.continue();
+                }
+                else {
+                    todoStore.clear();
+                    for (let i = 1; i < todoList.childNodes.length; i++)
+                        if (todoList.childNodes[i] === todo)
+                            todos[i-1].state == 'default' ? todos[i-1].state = 'done' : todos[i-1].state = 'default';
+                    todos.forEach(function(todo) {
+                        todoStore.add(todo);
+                    });
+                }
+            };
+        };
 
         // toggle todo
         todo.classList.toggle('done');
@@ -173,24 +216,41 @@ function todoHandle(event) {
     // remove todo 
     else if (event.target.classList[0] == 'todo-remove-button') {
         let todo = event.target.parentElement;
-        let todoStorage;
+        let todoDB;
+        let todoDBRequest;
+        let todoStore;
 
-        // get session storage todos
-        if (sessionStorage.getItem('todoStorage') === null) {
-            todoStorage = [];
-        }
-        else {
-            todoStorage = JSON.parse(sessionStorage.getItem('todoStorage'));
-        }
+        // make request to todo database
+        todoDBRequest = window.indexedDB.open(todoDBName, todoDBVersion);
 
-        // update session storage todos
-        for (let i = 1; i < todoList.childNodes.length; i++)
-            if (todoList.childNodes[i] === todo)
-                todoStorage.splice(i-1, 1);
-        sessionStorage.setItem('todoStorage', JSON.stringify(todoStorage));
+        // remove todo from todo store
+        todoDBRequest.onsuccess = event => {
+            let todos = [];
+            todoDB = event.target.result;
+        
+            let todoDBtransaction = todoDB.transaction(['todoStore'], 'readwrite');
+            todoStore = todoDBtransaction.objectStore('todoStore');
+        
+            todoStore.openCursor().onsuccess = event => {
+                if (event.target.result) {
+                    todos.push(event.target.result.value);
+                    event.target.result.continue();
+                }
+                else {
+                    todoStore.clear();
+                    for (let i = 1; i < todoList.childNodes.length; i++) {
+                        if (todoList.childNodes[i] === todo)
+                            todos.splice(i-1, 1);
+                    }
+                    todos.forEach(function(todo) {
+                        todoStore.add(todo);
+                    });
 
-        // remove todo
-        todo.remove();
+                    // remove todo
+                    todo.remove();
+                }
+            };
+        };
 
         return;
     }
@@ -198,85 +258,105 @@ function todoHandle(event) {
     return;
 }
 
-// load session storage todos
-function todoStorageLoad(event) {
-    let todoStorage;
+// load database todos
+function todoDBLoad(event) {
+    let todoDB;
+    let todoDBRequest;
+    let todoStore;
 
-    // get session storage todos
-    if (sessionStorage.getItem('todoStorage') === null) {
-        todoStorage = [];
-    }
-    else {
-        todoStorage = JSON.parse(sessionStorage.getItem('todoStorage'));
-    }
+    // make request to todo database
+    todoDBRequest = window.indexedDB.open(todoDBName, todoDBVersion);
 
-    // add session storage todos
-    todoStorage.forEach(function(todoStorageItem) {
-        let todo;
-        let todoContent
-        let todoTag;
-        let todoState;
-        let todoSpan;
-        let todoToolTip;
-        let todoDoneButton;
-        let todoRemoveButton;
+    // create todo store at todo database
+    todoDBRequest.onupgradeneeded = event => {
+        todoDB = event.target.result;
+        todoDB.createObjectStore('todoStore', {autoIncrement: true});
+        todoDB.createObjectStore('todoHeaderStore', {autoIncrement: true});
+    };
+
+    // add todo from todo store
+    todoDBRequest.onsuccess = event => {
+        let todos = [];
+        todoDB = event.target.result;
+        
+        let todoDBtransaction = todoDB.transaction(['todoStore'], 'readwrite');
+        todoStore = todoDBtransaction.objectStore('todoStore');
+        
+        todoStore.openCursor().onsuccess = event => {
+            if (event.target.result) {
+                todos.push(event.target.result.value);
+                event.target.result.continue();
+            } 
+            else { 
+                todos.forEach(function(todoStorageItem) {
+                let todo;
+                let todoContent
+                let todoTag;
+                let todoState;
+                let todoSpan;
+                let todoToolTip;
+                let todoDoneButton;
+                let todoRemoveButton;
     
-        // make todo
-        todo = document.createElement('div');
-        todo.classList.add('todo');
+                // make todo
+                todo = document.createElement('div');
+                todo.classList.add('todo');
 
-        // make todo content
-        todoContent = todoStorageItem.content;
+                // make todo content
+                todoContent = todoStorageItem.content;
 
-        // make todo tag
-        todoTag = todoStorageItem.tag;
+                // make todo tag
+                todoTag = todoStorageItem.tag;
 
-        // make todo state
-        todoState = todoStorageItem.state;
+                // make todo state
+                todoState = todoStorageItem.state;
 
-        // make todo tooltip
-        todoToolTip = document.createElement('span');
-        todoToolTip.classList.add('todo-tooltip');
-        todoToolTip.innerHTML = todoTag;
+                // make todo tooltip
+                todoToolTip = document.createElement('span');
+                todoToolTip.classList.add('todo-tooltip');
+                todoToolTip.innerHTML = todoTag;
 
-        // make todo span
-        todoSpan = document.createElement('span');
-        todoSpan.classList.add('todo-span');
-        todoSpan.innerText = todoContent;
+                // make todo span
+                todoSpan = document.createElement('span');
+                todoSpan.classList.add('todo-span');
+                todoSpan.innerText = todoContent;
 
-        // make todo done button
-        todoDoneButton = document.createElement('a');
-        todoDoneButton.classList.add('todo-done-button');
-        todoDoneButton.innerHTML = '<span class="material-icons">check</span>';
+                // make todo done button
+                todoDoneButton = document.createElement('a');
+                todoDoneButton.classList.add('todo-done-button');
+                todoDoneButton.innerHTML = '<span class="material-icons">check</span>';
 
-        // make todo remove button
-        todoRemoveButton = document.createElement('a');
-        todoRemoveButton.classList.add('todo-remove-button');
-        todoRemoveButton.innerHTML = '<span class="material-icons">delete</span>';
+                // make todo remove button
+                todoRemoveButton = document.createElement('a');
+                todoRemoveButton.classList.add('todo-remove-button');
+                todoRemoveButton.innerHTML = '<span class="material-icons">delete</span>';
 
-        // combine todo parts
-        if (todoTag)
-            todo.appendChild(todoToolTip);
-        todo.appendChild(todoSpan);
-        todo.appendChild(todoDoneButton);
-        todo.appendChild(todoRemoveButton);
+                // combine todo parts
+                if (todoTag)
+                    todo.appendChild(todoToolTip);
+                todo.appendChild(todoSpan);
+                todo.appendChild(todoDoneButton);
+                todo.appendChild(todoRemoveButton);
 
-        // add todo to list
-        todoList.appendChild(todo);
+                // add todo to list
+                todoList.appendChild(todo);
 
-        // toggle todo
-        if (todoState == 'done')
-            todo.classList.toggle('done');
+                // toggle todo
+                if (todoState == 'done')
+                    todo.classList.toggle('done');
 
-        // allow to pick todo
-        todoSpan.addEventListener('mousedown', todoPick);
+                // allow to pick todo
+                todoSpan.addEventListener('mousedown', todoPick);
 
-        // allow to show tooltip of todo subset
-        todoSpan.addEventListener('mouseover', todoSubsetTooltipToggle);
+                // allow to show tooltip of todo subset
+                todoSpan.addEventListener('mouseover', todoSubsetTooltipToggle);
 
-        // allow to hide tooltip of todo subset
-        todoSpan.addEventListener('mouseout', todoSubsetTooltipToggle);
-    });
+                // allow to hide tooltip of todo subset
+                todoSpan.addEventListener('mouseout', todoSubsetTooltipToggle);
+                });
+            }
+        };
+    };
 }
 
 // toggle environment theme
@@ -293,6 +373,9 @@ function envPageToggle(event) {
 // edit header of list
 function todoHeaderEdit() {
     let todoHeaderTA;
+    let todoDB;
+    let todoDBRequest;
+    let todoHeaderStore;
 
     // replace header with text area
     todoHeaderTA = document.createElement('textarea');
@@ -306,28 +389,75 @@ function todoHeaderEdit() {
         todoHeader.innerHTML = todoHeaderTA.value;
         todoHeaderTA.replaceWith(todoHeader);
 
-        // update session storage header
-        sessionStorage.setItem('todoHeader', JSON.stringify(todoHeader.innerHTML));
+        // make request to todo database
+        todoDBRequest = window.indexedDB.open(todoDBName, todoDBVersion);
+
+        // create todo header store at todo database
+        todoDBRequest.onupgradeneeded = event => {
+            todoDB = event.target.result;
+            todoDB.createObjectStore('todoStore', {autoIncrement: true});
+            todoDB.createObjectStore('todoHeaderStore', {autoIncrement: true});
+        };
+
+        // update todo header store
+        todoDBRequest.onsuccess = event => {
+            todoDB = event.target.result;
+        
+            let todoDBtransaction = todoDB.transaction(['todoHeaderStore'], 'readwrite');
+            todoHeaderStore = todoDBtransaction.objectStore('todoHeaderStore');
+
+            todoHeaderStore.clear();
+            todoHeaderStore.add(todoHeader.innerHTML);
+        };
 
         // update todo page header
         todoPageHeader.innerHTML = todoHeader.innerHTML;
     });
 }
 
-// load session storage header
-function todoHeaderStorageLoad(event) {
-     // get session storage header
-    if (sessionStorage.getItem('todoHeader') == null) {
-        return;
-    }
-    else {
-        // replace header with session storage header
-        let todoHeaderStorage;
-        todoHeaderStorage = JSON.parse(sessionStorage.getItem('todoHeader'));
-        todoHeader.innerHTML = todoHeaderStorage;
-        todoPageHeader.innerHTML = todoHeaderStorage;
-        return;
-    }
+// load database todo header
+function todoHeaderDBLoad(event) {
+    let todoDB;
+    let todoDBRequest;
+    let todoHeaderStore;
+
+    // make request to todo database
+    todoDBRequest = window.indexedDB.open(todoDBName, todoDBVersion);
+
+    // create todo header store at todo database
+    todoDBRequest.onupgradeneeded = event => {
+        todoDB = event.target.result;
+        todoDB.createObjectStore('todoStore', {autoIncrement: true});
+        todoDB.createObjectStore('todoHeaderStore', {autoIncrement: true});
+    };
+
+    // replace header with header from store
+    todoDBRequest.onsuccess = event => {
+        let todoHeaders = [];
+        todoDB = event.target.result;
+       
+        let todoDBtransaction = todoDB.transaction(['todoHeaderStore'], 'readwrite');
+        todoHeaderStore = todoDBtransaction.objectStore('todoHeaderStore');
+       
+        todoHeaderStore.openCursor().onsuccess = event => {
+            if (event.target.result) {
+                todoHeaders.push(event.target.result.value);
+                event.target.result.continue();
+            }
+            else {
+                if (todoHeader.length == 0) {
+                    console.log('Here');
+                    return;
+                }
+                else {
+
+                    todoHeader.innerHTML = todoHeaders[0];
+                    todoPageHeader.innerHTML = todoHeaders[0];
+                    return;
+                }
+            }
+        };
+    };
 }
 
 // toggle todo input button
@@ -389,7 +519,9 @@ function todoDrop(event) {
     let target;
     let targetIndex;
     let todoIndex;
-    let todoStorage;
+    let todoDB;
+    let todoDBRequest;
+    let todoStore;
 
     // get todo, its shadow and target
     todo        = event.target.parentElement;
@@ -435,35 +567,49 @@ function todoDrop(event) {
         // do nothing
     }
 
-    // get session storage todos
-    if (sessionStorage.getItem('todoStorage') === null) {
-        todoStorage = [];
-    }
-    else {
-        todoStorage = JSON.parse(sessionStorage.getItem('todoStorage'));
-    }
-    
-    // update session storage todos
-    if (todoIndex < targetIndex) {
-        // go down with swaps
-        for (let i = todoIndex; i < targetIndex; i++) {
-            let blank = todoStorage[i-1];
-            todoStorage[i-1] = todoStorage[i];
-            todoStorage[i]   = blank;
-        }
-    }
-    else if (todoIndex > targetIndex) {
-        // go up with swaps
-        for (let i = todoIndex; i > targetIndex; i--) {
-            let blank = todoStorage[i-2];
-            todoStorage[i-2] = todoStorage[i-1];
-            todoStorage[i-1] = blank;
-        }
-    }
-    else {
-        // do nothing
-    }
-    sessionStorage.setItem('todoStorage', JSON.stringify(todoStorage));
+    // make request to todo database
+    todoDBRequest = window.indexedDB.open(todoDBName, todoDBVersion);
+
+    // update todo store
+    todoDBRequest.onsuccess = event => {
+        let todos = [];
+        todoDB = event.target.result;
+        
+        let todoDBtransaction = todoDB.transaction(['todoStore'], 'readwrite');
+        todoStore = todoDBtransaction.objectStore('todoStore');
+        
+        todoStore.openCursor().onsuccess = event => {
+            if (event.target.result) {
+                todos.push(event.target.result.value);
+                event.target.result.continue();
+            }
+            else {
+                todoStore.clear();
+                if (todoIndex < targetIndex) {
+                    // go down with swaps
+                    for (let i = todoIndex; i < targetIndex; i++) {
+                        let blank = todos[i-1];
+                        todos[i-1] = todos[i];
+                        todos[i]   = blank;
+                    }
+                }
+                else if (todoIndex > targetIndex) {
+                    // go up with swaps
+                    for (let i = todoIndex; i > targetIndex; i--) {
+                        let blank = todos[i-2];
+                        todos[i-2] = todos[i-1];
+                        todos[i-1] = blank;
+                    }
+                }
+                else {
+                    // do nothing
+                }
+                todos.forEach(function(todo) {
+                    todoStore.add(todo);
+                });
+             }
+        };
+    };
 
     // stop listen drag and drop
     document
