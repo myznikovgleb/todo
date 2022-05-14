@@ -22,6 +22,8 @@ document
     .addEventListener('DOMContentLoaded', todoHeaderDBLoad);
 document
     .addEventListener('DOMContentLoaded', todoDBLoad);
+document
+    .addEventListener('DOMContentLoaded', envThemeLoad);
 todoInputItem
     .addEventListener('input', todoInputButtonToggle);
 todoInputItem
@@ -130,11 +132,12 @@ function todoAdd(event) {
     // make request to todo database
     todoDBRequest = window.indexedDB.open(todoDBName, todoDBVersion);
 
-    // create todo store at todo database
+    // create stores at todo database
     todoDBRequest.onupgradeneeded = event => {
         todoDB = event.target.result;
         todoDB.createObjectStore('todoStore', {autoIncrement: true});
         todoDB.createObjectStore('todoHeaderStore', {autoIncrement: true});
+        todoDB.createObjectStore('envThemeStore', {autoIncrement: true});
     };
 
     // add todo to todo store
@@ -267,11 +270,12 @@ function todoDBLoad(event) {
     // make request to todo database
     todoDBRequest = window.indexedDB.open(todoDBName, todoDBVersion);
 
-    // create todo store at todo database
+    // create stores at todo database
     todoDBRequest.onupgradeneeded = event => {
         todoDB = event.target.result;
         todoDB.createObjectStore('todoStore', {autoIncrement: true});
         todoDB.createObjectStore('todoHeaderStore', {autoIncrement: true});
+        todoDB.createObjectStore('envThemeStore', {autoIncrement: true});
     };
 
     // add todo from todo store
@@ -361,13 +365,42 @@ function todoDBLoad(event) {
 
 // toggle environment theme
 function envThemeToggle(event) {
+    let todoDB;
+    let todoDBRequest;
+    let envThemeStore;
+
     document.body.classList.toggle('dark');
     document.body.classList.toggle('light');
+
+    // make request to todo database
+    todoDBRequest = window.indexedDB.open(todoDBName, todoDBVersion);
+
+    // create stores at todo database
+    todoDBRequest.onupgradeneeded = event => {
+        todoDB = event.target.result;
+        todoDB.createObjectStore('todoStore', {autoIncrement: true});
+        todoDB.createObjectStore('todoHeaderStore', {autoIncrement: true});
+        todoDB.createObjectStore('envThemeStore', {autoIncrement: true});
+    };
+
+    // update environment theme store
+    todoDBRequest.onsuccess = event => {
+        todoDB = event.target.result;
+        
+        let todoDBtransaction = todoDB.transaction(['envThemeStore'], 'readwrite');
+        envThemeStore = todoDBtransaction.objectStore('envThemeStore');
+
+        envThemeStore.clear();
+        envThemeStore.add(document.body.classList[0]);
+    };
+
+    return;
 }
 
 // toggle environment pages
 function envPageToggle(event) {
     todoPagesCanvas.classList.toggle('hidden');
+    return;
 }
 
 // edit header of list
@@ -392,11 +425,12 @@ function todoHeaderEdit() {
         // make request to todo database
         todoDBRequest = window.indexedDB.open(todoDBName, todoDBVersion);
 
-        // create todo header store at todo database
+        // create stores at todo database
         todoDBRequest.onupgradeneeded = event => {
             todoDB = event.target.result;
             todoDB.createObjectStore('todoStore', {autoIncrement: true});
             todoDB.createObjectStore('todoHeaderStore', {autoIncrement: true});
+            todoDB.createObjectStore('envThemeStore', {autoIncrement: true});
         };
 
         // update todo header store
@@ -413,6 +447,8 @@ function todoHeaderEdit() {
         // update todo page header
         todoPageHeader.innerHTML = todoHeader.innerHTML;
     });
+
+    return;
 }
 
 // load database todo header
@@ -424,11 +460,12 @@ function todoHeaderDBLoad(event) {
     // make request to todo database
     todoDBRequest = window.indexedDB.open(todoDBName, todoDBVersion);
 
-    // create todo header store at todo database
+    // create stores at todo database
     todoDBRequest.onupgradeneeded = event => {
         todoDB = event.target.result;
         todoDB.createObjectStore('todoStore', {autoIncrement: true});
         todoDB.createObjectStore('todoHeaderStore', {autoIncrement: true});
+        todoDB.createObjectStore('envThemeStore', {autoIncrement: true});
     };
 
     // replace header with header from store
@@ -445,12 +482,10 @@ function todoHeaderDBLoad(event) {
                 event.target.result.continue();
             }
             else {
-                if (todoHeader.length == 0) {
-                    console.log('Here');
+                if (todoHeaders.length == 0) {
                     return;
                 }
                 else {
-
                     todoHeader.innerHTML = todoHeaders[0];
                     todoPageHeader.innerHTML = todoHeaders[0];
                     return;
@@ -720,3 +755,47 @@ function todoSubsetTooltipToggle(event) {
 
     return;
 };
+
+// load environment theme
+function envThemeLoad(event) {
+    let todoDB;
+    let todoDBRequest;
+    let envThemeStore;
+
+    // make request to todo database
+    todoDBRequest = window.indexedDB.open(todoDBName, todoDBVersion);
+
+    // create stores at todo database
+    todoDBRequest.onupgradeneeded = event => {
+        todoDB = event.target.result;
+        todoDB.createObjectStore('todoStore', {autoIncrement: true});
+        todoDB.createObjectStore('todoHeaderStore', {autoIncrement: true});
+        todoDB.createObjectStore('envThemeStore', {autoIncrement: true});
+    };
+
+    // toggle theme with theme from store
+    todoDBRequest.onsuccess = event => {
+        let envThemes = [];
+        todoDB = event.target.result;
+       
+        let todoDBtransaction = todoDB.transaction(['envThemeStore'], 'readwrite');
+        envThemeStore = todoDBtransaction.objectStore('envThemeStore');
+       
+        envThemeStore.openCursor().onsuccess = event => {
+            if (event.target.result) {
+                envThemes.push(event.target.result.value);
+                event.target.result.continue();
+            }
+            else {
+                if (envThemes.length == 0) {
+                    return;
+                }
+                else if (envThemes[0] == 'dark') {
+                    document.body.classList.toggle('dark');
+                    document.body.classList.toggle('light');
+                    return;
+                }
+            }
+        };
+    };
+}
